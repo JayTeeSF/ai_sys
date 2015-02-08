@@ -1,4 +1,4 @@
-# irb -r "./ai_sys.rb"
+# irb -r "./lib/ai_sys.rb"
 #> ais = AiSys.new
 #> ais.public_methods(false)
 #> ais.sub("cat", "animal")
@@ -17,11 +17,11 @@
 # }>
 
 
-require_relative "./individual"
-require_relative "./relation"
-require_relative "./value"
-require_relative "./subcategory"
-require_relative "./storage_wrapper"
+require_relative "./ai_sys/individual"
+require_relative "./ai_sys/relation"
+require_relative "./ai_sys/value"
+require_relative "./ai_sys/subcategory"
+require_relative "./ai_sys/storage_wrapper"
 
 class AiSys
   STORE_KEY = "store"
@@ -41,20 +41,29 @@ class AiSys
   end
 
   DEFAULT_STORE = StorageWrapper.new
-  def initialize
-    @store = DEFAULT_STORE
+  def initialize(options={})
+    @store = options.delete(AiSys::STORE_KEY) || DEFAULT_STORE
   end
 
   def repo
     @store
   end
 
+  def load
+    repo.load
+  end
+
+  def save
+    repo.persist
+  end
+
   #individual.rb
   def ind(individual, category)
-    ind = ::Individual.ind(individual, category, @store)
-    #ind.save(@store)
-    if ind.create
-      ind.save #(@store)
+    ind = ::Individual.ind(individual, category)
+    puts "******************* store before ind.create: #{@store.inspect}"
+    if ind.create(AiSys::STORE_KEY => @store)
+      puts "******************* store before ind.save: #{@store.inspect}"
+      ind.save(@store)
     else
       warn "failed to create #{individual} as an instance of #{category}"
     end
@@ -74,10 +83,10 @@ class AiSys
   end
 
   #subcategory.rb
-  def sub(subcategory, category, options={})
-    sub = ::Subcategory.sub(subcategory, category, options)
+  def sub(subcategory, category) #, options={})
+    sub = ::Subcategory.sub(subcategory, category) #, options)
     if sub.create
-      sub.save #(@store)
+      sub.save(@store)
     else
       warn "failed to create class hierarcy"
     end
