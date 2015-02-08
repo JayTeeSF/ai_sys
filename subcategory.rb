@@ -64,7 +64,9 @@ class Subcategory
   def subclass
     unless @subclass
       puts "got superclass: #{superclass}"
-      @context.const_set(subclass_name, Class.new(superclass))
+      unless @context.const_defined?(subclass_name)
+        @context.const_set(subclass_name, Class.new(superclass))
+      end
       @subclass = @context.const_get(subclass_name)
       puts "#{@subclass} is_a?(#{superclass}): #{@subclass < superclass}"
     end

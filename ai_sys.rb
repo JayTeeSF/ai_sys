@@ -51,7 +51,7 @@ class AiSys
 
   #individual.rb
   def ind(individual, category)
-    ind = ::Individual.ind(individual, category)
+    ind = ::Individual.ind(individual, category, @store)
     #ind.save(@store)
     if ind.create
       ind.save #(@store)

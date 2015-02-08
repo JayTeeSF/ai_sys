@@ -3,8 +3,8 @@ class Individual
   CATEGORY   = "category"
   INDIVIDUAL = "individual"
 
-  def self.ind(individual, category)
-    ind = new(INDIVIDUAL => individual, CATEGORY => category)
+  def self.ind(individual, category, store)
+    ind = new(INDIVIDUAL => individual, CATEGORY => category, AiSys::STORE_KEY => store)
     puts ind
     ind
   end
@@ -12,6 +12,8 @@ class Individual
   def initialize(options={})
     @individual = options.delete(INDIVIDUAL)
     @category = options.delete(CATEGORY)
+    @store = options.delete(AiSys::STORE_KEY)
+    fail("missing store") unless @store
   end
 
   def to_s
@@ -46,7 +48,7 @@ class Individual
     @clazz
   end
 
-  def save(store)
+  def save(store=@store)
     store.save(self.class, {
       INDIVIDUAL => @individual,
       CATEGORY => @category,

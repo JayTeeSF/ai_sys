@@ -7,15 +7,26 @@ class StorageWrapper
   #end
 
   # the finders will be key!
-  def find_by(attribute_hash)
+  def find_by(query_hash)
     class_name = nil
     class_attrs = {}
-    search_key = attribute_hash.keys.first
-    search_value = attribute_hash.values.first
-    @repo.select{|_class_name,_class_attrs|
-      found_key = _class_attrs.keys.first
-      found_value = _class_attrs.values.first
-      if ( (search_key == found_key) && (search_value == found_value))
+    #search_key = query_hash.keys.first
+    #search_value = query_hash.values.first
+    puts "=========================> REPO: #{@repo.inspect}"
+    @repo.detect{|_class_name,_all_class_attrs|
+      puts "------------------------> _class_name: #{_class_name.inspect}, _all_class_attrs: #{_all_class_attrs.inspect}"
+      #found_key = _class_attrs.keys.first
+      #found_value = _class_attrs.values.first
+      
+      #if ( (search_key == found_key) && (search_value == found_value))
+      # Find a stored hash that matches the key-value-pairs in the
+      # incoming query_hash
+      _class_attrs = _all_class_attrs.detect{|stored_attr_hash|
+        query_hash.all? {|query_attr, query_value|
+          query_value == stored_attr_hash[query_attr]
+        }
+      }
+      if _class_attrs
         class_name = AiSys.classify(_class_name)
         class_attrs = _class_attrs
         true
