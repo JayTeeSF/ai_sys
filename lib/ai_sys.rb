@@ -40,6 +40,14 @@ class AiSys
     string
   end
 
+  def self.restore(options={})
+    it = new(options)
+    puts "empty-repo: #{it.repo.inspect}"
+    it.restore
+    puts "restored-repo: #{it.repo.inspect}"
+    it
+  end
+
   DEFAULT_STORE = StorageWrapper.new
   def initialize(options={})
     @store = options.delete(AiSys::STORE_KEY) || DEFAULT_STORE
@@ -49,12 +57,14 @@ class AiSys
     @store
   end
 
-  def load
-    repo.load
+  def restore
+    @store.restore
   end
 
   def save
-    repo.persist
+    result = @store.persist
+    puts "persisted-repo: #{repo.inspect}"
+    result
   end
 
   #individual.rb
@@ -65,19 +75,29 @@ class AiSys
     else
       warn "failed to create #{individual} as an instance of #{category}"
     end
+    ind
   end
 
   #relation.rb
   def rel(range_category, domain_category, relation)
     rel = ::Relation.rel(domain_category, relation, range_category)
-    rel.save(@store)
+    if rel.create
+      rel.save(@store)
+    else
+      warn "failed to save the rel"
+    end
+    rel
   end
 
   #value.rb
   def val(individual, relation, value)
     val = ::Value.val(individual, relation, value)
-    #val.create
-    val.save(@store)
+    if val.create
+      val.save(@store)
+    else
+      warn "failed to save the value"
+    end
+    val
   end
 
   #subcategory.rb
@@ -88,5 +108,6 @@ class AiSys
     else
       warn "failed to create class hierarcy"
     end
+    sub
   end
 end

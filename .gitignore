@@ -1,3 +1,4 @@
+db/*
 *.tmproj
 .ignore/*
 .ignore/**

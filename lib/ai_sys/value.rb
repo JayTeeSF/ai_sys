@@ -22,6 +22,14 @@ class Value
     @value = options.delete(VALUE)
   end
 
+  def create
+  # ais.val("pj", "birthday", "1999-05-20") # this should update the ind. called pj!
+    #lookup Individual => @individual
+    #give it a relation if it doesn't have one...
+    #assign value to it's relation
+    false
+  end
+
   def to_s
     "#{@individual}'s #{@relation} is #{@value}"
   end

@@ -1,3 +1,4 @@
+require_relative "./overrides"
 # aka: a Class / SubClass hierarchy
 class Subcategory
   SUBCATEGORY_KEY = "subcategory"
@@ -59,7 +60,6 @@ class Subcategory
         end
       else
         # Run extant "rules" that define @category as @subcategory
-        #if parent_category_rule = Subcategory.find_by({CATEGORY_KEY => @category}, @store)
         if parent_category_rule = Subcategory.find_by({SUBCATEGORY_KEY => @category}, options) #, @store)
           @superclass = parent_category_rule.subclass(options)
         else
@@ -81,10 +81,14 @@ class Subcategory
   def subclass(options={})
     unless @subclass
       puts "got superclass: #{superclass(options)}"
-      unless @context.const_defined?(subclass_name)
+      # FORCE subclassing... to fix hierarchy bug !?
+      suppress_warnings {
         @context.const_set(subclass_name, Class.new(superclass(options)))
-      end
+      }
       @subclass = @context.const_get(subclass_name)
+      unless @subclass < superclass(options)
+        warn "class-hierarchy ordering bug"
+      end
       puts "#{@subclass} is_a?(#{superclass(options)}): #{@subclass < superclass(options)}"
     end
     @subclass

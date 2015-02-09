@@ -9,11 +9,12 @@ rescue LoadError
 end
 
 if __FILE__ == $PROGRAM_NAME
-  ais = AiSys.new
+  ais = AiSys.restore
   ais.sub("cat", "animal")
   ais.ind("pj", "cat")
   ais.sub("dog", "wolf")
   ais.sub("wolf", "animal")
-  ais.val("pj", "birthdate", "1999-05-20")
-  puts "repo: #{ais.repo.inspect}"
+  ais.rel("date", "animal", "birthday") # this should update the animal class
+  ais.val("pj", "birthday", "1999-05-20") # this should update the ind. called pj!
+  ais.save
 end

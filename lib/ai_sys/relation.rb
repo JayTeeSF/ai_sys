@@ -22,6 +22,7 @@ class Relation
   # rel birthday animal date
   #     relation domain range
   # => the birthday relation holds between each animal and some date
+  # (range: "date", domain: "animal", relation: "birthday")
   def self.rel(range_category, domain_category, relation)
     rel = new(
       RANGE_CATEGORY => range_category,
@@ -36,6 +37,12 @@ class Relation
     @name = options.delete(NAME)
     @domain_category = options.delete(DOMAIN_CATEGORY)
     @range_category = options.delete(RANGE_CATEGORY)
+  end
+
+  def create
+    #lookup category or subcategory => @domain_category
+    #{}
+    false
   end
 
   def to_s
