@@ -46,15 +46,11 @@ class Individual
   def clazz(options={})
     unless @clazz
       # these so-called "rules" are actually objects of type @category
-      puts "calling Subcategory.find_by w/ #{options.inspect}"
       if sub_category_rule = Subcategory.find_by({Subcategory::SUBCATEGORY_KEY => @category}, options)
-        puts "getting sub_cat.subclass(#{options.inspect})"
         @clazz = sub_category_rule.subclass(options)
       elsif super_category_rule = Subcategory.find_by({Subcategory::CATEGORY_KEY => @category}, options)
-        puts "got cat.superclass(#{options.inspect})"
         @clazz = super_category_rule.superclass(options)
       else
-      puts "setting up a new obj"
         current_context = Object
         unless current_context.const_defined?(@category)
           current_context.const_set(@category, Class.new)

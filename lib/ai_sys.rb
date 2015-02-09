@@ -60,9 +60,7 @@ class AiSys
   #individual.rb
   def ind(individual, category)
     ind = ::Individual.ind(individual, category)
-    puts "******************* store before ind.create: #{@store.inspect}"
     if ind.create(AiSys::STORE_KEY => @store)
-      puts "******************* store before ind.save: #{@store.inspect}"
       ind.save(@store)
     else
       warn "failed to create #{individual} as an instance of #{category}"
@@ -83,8 +81,8 @@ class AiSys
   end
 
   #subcategory.rb
-  def sub(subcategory, category) #, options={})
-    sub = ::Subcategory.sub(subcategory, category) #, options)
+  def sub(subcategory, category)
+    sub = ::Subcategory.sub(subcategory, category)
     if sub.create
       sub.save(@store)
     else

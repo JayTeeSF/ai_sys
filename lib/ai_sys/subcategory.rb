@@ -36,7 +36,11 @@ class Subcategory
   def create(options={})
     puts "creating #{subclass_name} as subclass of #{superclass(options).inspect}"
     subclass(options)
-    subclass(options) < superclass(options) # true/false
+    result = subclass(options) < superclass(options) # true/false
+    unless result
+      puts "! subclass(#{subclass(options).inspect}) < superclass(#{superclass(options).inspect})"
+    end
+    result
   end
 
   def save(store=@store)

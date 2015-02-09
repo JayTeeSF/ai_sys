@@ -6,9 +6,7 @@ class StorageWrapper
   # the finders will be key!
   def find(lookup_hash, _class_name)
     puts "looking-up (& instantiating) object for: #{lookup_hash.inspect}"
-    puts "=========================> REPO: #{@repo[_class_name].inspect}"
     _all_class_attrs = (@repo[_class_name]||[])
-    puts "------------------------> _all_class_attrs: #{_all_class_attrs.inspect}"
 
     # Find a stored hash that matches the key-value-pairs in the
     # incoming lookup_hash
@@ -36,13 +34,13 @@ class StorageWrapper
   def save(key, attributes={})
     key = key.to_s
     unless @repo[key]
-      puts "XXXXXXXX no #{key} in repo!"
+      puts "REPO adding array of: #{key}'s"
       @repo[key] = []
     end
     if @repo[key].include?(attributes)
-      puts "XXXXXXXX modifying repo[#{key}]: no-op"
+      puts "REPO[#{key}]: no-op (duplicate)"
     else
-      puts "XXXXXXXX modifying repo[#{key}]: #{attributes.inspect}"
+      puts "REPO[#{key}] << #{attributes.inspect}"
       @repo[key].<<(attributes)
     end
   end
