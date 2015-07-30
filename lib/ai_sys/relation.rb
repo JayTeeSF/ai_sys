@@ -1,3 +1,8 @@
+#Perhaps (re-/)open a mixin <class:Animal>Relation
+# then add the method or attribute
+# tbd, how-to enable a function (not just a static-value)
+# ...what ?common? arguments to pass
+###
 # aka: a method / attribute of a class
 # perhaps it's an instance-method and its argument/return-value:
 # class Animal
@@ -40,7 +45,7 @@ class Relation
   end
 
   def create
-    #lookup category or subcategory => @domain_category
+    warn "FIXME: lookup category or subcategory => @domain_category"
     #{}
     false
   end

@@ -1,3 +1,4 @@
+require_relative '../json_store'
 class StorageWrapper
   LATEST = -1
   DEFAULT_BASENAME = "storage"
@@ -90,20 +91,31 @@ class StorageWrapper
   private
 
   def data_dump
-    Marshal.dump(@repo)
+    #Marshal.dump(@repo)
+    @repo
   end
 
+  # JSON.parse(File.read(db_file))
   def reload(db_file)
-    Marshal.load(data_load(db_file))
+    # Marshal.load(data_load(db_file))
+    data_load(db_file) do |db|
+      db.roots.reduce({}) { |memo, name|
+        memo[name] = db[name]
+        memo
+      }
+    end
   end
 
   def data_load(db_file)
-    File.read(db_file)
+    #File.read(db_file)
+    jstore = ::JsonStore.new(db_file)
+    return jstore unless block_given?
+    jstore.transaction { yield jstore }
   end
 
   def latest_data_load
     return unless latest_db
-    data_load(latest_db)
+    reload(latest_db)
   end
 
   def default_db_basename
@@ -130,7 +142,12 @@ class StorageWrapper
   end
 
   def store(data, file_name)
-    File.open(file_name, 'w') { |f| f.write(data) }
+    #File.open(file_name, 'w') { |f| f.write(data) }
+    data_load(file_name) do |db|
+      data.keys.each do |key|
+        db[key] = data[key]
+      end
+    end
   end
 
   # reverse sort files by extension
