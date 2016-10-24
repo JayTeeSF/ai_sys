@@ -11,7 +11,7 @@ class StorageWrapper
 
   # the finders will be key!
   def find(lookup_hash, _class_name)
-    puts "looking-up (& instantiating) object for: #{lookup_hash.inspect}"
+    puts "\tLOOKING-UP (& instantiating) object for: #{lookup_hash.inspect}\n"
     _all_class_attrs = (@repo[_class_name]||[])
 
     # Find a stored hash that matches the key-value-pairs in the
@@ -27,14 +27,31 @@ class StorageWrapper
     return result ? result.dup : result
   end
 
+  def find_all(lookup_hash, _class_name)
+    puts "\tLOOKING-UP (& instantiating) object(s) for: #{lookup_hash.inspect}\n"
+    _all_class_attrs = (@repo[_class_name]||[])
+
+    # Find all stored hashes that match the key-value-pairs in the
+    # incoming lookup_hash
+    results = _all_class_attrs.select do |stored_attr_hash|
+      lookup_hash.all? do |lookup_attr, lookup_value|
+        lookup_value == stored_attr_hash[lookup_attr]
+      end
+    end
+
+    # NOT dup'ing the result, before calling .new(result) leads to a BUG
+    # that modifies @repo !?
+    return results ? results.dup : results
+  end
+
   def restore(version=LATEST)
-    print "restoring"
+    print "\tRESTORING"
     current_db_files = dbs
     if LATEST == version
-      puts " the latest version..."
+      puts " the latest version...\n"
       db_file = current_db_files.first
     else
-      puts " version: #{version}..."
+      puts " version: #{version}...\n"
       db_file = current_db_files.detect do |f|
         file_to_extension_number(f) == version
       end
@@ -45,29 +62,29 @@ class StorageWrapper
       @repo = reload(db_file)
       true
     else
-      puts "no-op (no db(s))"
+      puts "\tNO-OP (no db(s))\n"
       false
     end
   end
 
   def persist
-    print "storing to"
+    print "\tSTORING"
     file_name = new_db
     if file_name
-      print " new_db: "
+      print " in new_db: "
     else
       if file_name = default_db
-        print " default_db: "
+        print " in default_db: "
       else
         return false
       end
     end
     _data_dump = data_dump
     if _data_dump == latest_data_load
-      puts " no-op (duplicate)..."
+      puts " NO-OP (duplicate)...\n"
       false
     else
-      puts " #{file_name}..."
+      puts " #{file_name}...\n"
       store(_data_dump, file_name)
       true
     end
@@ -76,13 +93,13 @@ class StorageWrapper
   def save(key, attributes={})
     key = key.to_s
     unless @repo[key]
-      puts "REPO adding array of: #{key}'s"
+      puts "\tREPO adding array of: #{key}'s\n"
       @repo[key] = []
     end
     if @repo[key].include?(attributes)
-      puts "REPO[#{key}]: no-op (duplicate)"
+      puts "\tREPO[#{key}]: no-op (duplicate)\n"
     else
-      puts "REPO[#{key}] << #{attributes.inspect}"
+      puts "\tREPO[#{key}] << #{attributes.inspect}\n"
       @repo[key].<<(attributes)
     end
   end

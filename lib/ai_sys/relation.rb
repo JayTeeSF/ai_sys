@@ -28,12 +28,18 @@ class Relation
   #     relation domain range
   # => the birthday relation holds between each animal and some date
   # (range: "date", domain: "animal", relation: "birthday")
-  def self.rel(range_category, domain_category, relation)
+  #   Official p 485/486
+  #   # rel(birthday: Relation, animal: Domain, date: Range)
+  #   hmm:
+  #   "animal", "birthday", "date"
+
+  def self.rel(domain_category, relation, range_category)
     rel = new(
-      RANGE_CATEGORY => range_category,
+      NAME => relation,
       DOMAIN_CATEGORY => domain_category,
-      NAME => relation
+      RANGE_CATEGORY => range_category
     )
+    puts
     puts rel
     rel
   end
@@ -44,14 +50,28 @@ class Relation
     @range_category = options.delete(RANGE_CATEGORY)
   end
 
-  def create
-    warn "FIXME: lookup category or subcategory => @domain_category"
-    #{}
-    false
+  #Return: [obj, err]
+  # alias for to_ruby
+  def create(options={})
+    created = nil
+    error = nil
+    #lookup category => @domain_category
+    _ruby_sub = ::Subcategory.clazz_for(@domain_category, options)
+    # _ruby_sub, error = sub.create #(options)
+    #no need to check it's subcategories
+    _ruby_sub.send(:define_method, "#{@name}=") { |val| instance_variable_set("@name", val) }
+    _ruby_sub.send(:define_method, @name) { instance_variable_get("@name") }
+    instance = _ruby_sub.new
+    created = instance.method(@name)
+    unless created
+      error = "Failed to create #{@name} relation for #{@domain_category} category"
+    end
+    [created, error]
   end
 
   def to_s
-    "Every #{@domain_category} has a #{@name} with some #{@range_category}"
+    "The #{@name} Relation holds between each #{@domain_category} and some #{@range_category}"
+    # "Every #{@domain_category} has a #{@name} with some #{@range_category}"
   end
 
   def save(store)
@@ -62,3 +82,4 @@ class Relation
     })
   end
 end
+require_relative "./subcategory"

@@ -42,9 +42,9 @@ class AiSys
 
   def self.restore(options={})
     it = new(options)
-    puts "empty-repo: #{it.repo.inspect}"
+    puts "\nStarting with an Empty Repo: #{it.repo.inspect}"
     it.restore
-    puts "restored-repo: #{it.repo.inspect}"
+    puts "Continuing with Repo: #{it.repo.inspect}\n\n"
     it
   end
 
@@ -63,28 +63,30 @@ class AiSys
 
   def save
     result = @store.persist
-    puts "persisted-repo: #{repo.inspect}"
+    puts "\nPersisted Repo: #{repo.inspect}\n"
     result
   end
 
   #individual.rb
   def ind(individual, category)
     ind = ::Individual.ind(individual, category)
-    if ind.create(AiSys::STORE_KEY => @store)
-      ind.save(@store)
+    _ruby_ind, error = ind.create(AiSys::STORE_KEY => @store)
+    if error
+      warn "\t*** FAILED: to create #{individual} as an instance of #{category}: #{error}\n"
     else
-      warn "failed to create #{individual} as an instance of #{category}"
+      ind.save(@store)
     end
     ind
   end
 
   #relation.rb
-  def rel(range_category, domain_category, relation)
+  def rel(domain_category, relation, range_category)
     rel = ::Relation.rel(domain_category, relation, range_category)
-    if rel.create
-      rel.save(@store)
+    _ruby_rel, error = rel.create #(AiSys::STORE_KEY => @store)
+    if error
+      warn "\t*** FAILED: to save the rel: #{error}\n"
     else
-      warn "failed to save the rel"
+      rel.save(@store)
     end
     rel
   end
@@ -92,10 +94,12 @@ class AiSys
   #value.rb
   def val(individual, relation, value)
     val = ::Value.val(individual, relation, value)
-    if val.create
-      val.save(@store)
+    # if val.create
+    _ruby_val, error = val.create(AiSys::STORE_KEY => @store)
+    if error
+      warn "\t*** FAILED: to save the value: #{error}\n"
     else
-      warn "failed to save the value"
+      val.save(@store)
     end
     val
   end
@@ -103,10 +107,11 @@ class AiSys
   #subcategory.rb
   def sub(subcategory, category)
     sub = ::Subcategory.sub(subcategory, category)
-    if sub.create
-      sub.save(@store)
+    _ruby_sub, error = sub.create
+    if error
+      warn "\t*** FAILED: to create class hierarcy: #{error}\n"
     else
-      warn "failed to create class hierarcy"
+      sub.save(@store)
     end
     sub
   end

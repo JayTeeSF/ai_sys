@@ -5,21 +5,53 @@ class Subcategory
   CATEGORY_KEY    = "category"
   CONTEXT_KEY     = "context"
 
+  # FIXME: duplicated code (see subcategory#subclass)
+  # lookup the class associated with category
+  def self.clazz_for(category, options={})
+    unless @clazz
+      # these so-called "rules" are actually objects of type category
+      if sub_category_rule = Subcategory.find_by({Subcategory::SUBCATEGORY_KEY => category}, options)
+        @clazz = sub_category_rule.subclass(options)
+      elsif super_category_rule = Subcategory.find_by({Subcategory::CATEGORY_KEY => category}, options)
+        @clazz = super_category_rule.superclass(options)
+      else
+        current_context = Object
+        unless current_context.const_defined?(category)
+          current_context.const_set(category, Class.new)
+        end
+        @clazz = current_context.const_get(category)
+      end
+    end
+    @clazz
+  end
+
+  def self.find_all_by(lookup_hash, options={})
+    return [] unless lookup_hash
+    puts "\nFinding All #{self} rules for: #{lookup_hash.inspect}...\n"
+    store = options[AiSys::STORE_KEY] || AiSys::DEFAULT_STORE
+    all_attrs = store.find_all(lookup_hash, self.to_s)
+
+    return all_attrs.map { |attrs|
+      attrs ? new(attrs) : attrs
+    }
+  end
+
+  def self.find_by(lookup_hash, options={})
+    return nil unless lookup_hash # or do we return anything or the first thing!?
+    puts "\nFinding #{self} rules for: #{lookup_hash.inspect}...\n"
+    store = options[AiSys::STORE_KEY] || AiSys::DEFAULT_STORE
+    attrs = store.find(lookup_hash, self.to_s)
+    attrs ? new(attrs) : attrs
+  end
+
   def self.sub(subcategory, category, options={})
     sub = new(options.merge({
       SUBCATEGORY_KEY => subcategory,
       CATEGORY_KEY    => category
     }))
+    puts
     puts sub
     sub
-  end
-
-  def self.find_by(lookup_hash, options={})
-    return nil unless lookup_hash # or do we return anything or the first thing!?
-    puts "Finding #{self} rules for: #{lookup_hash.inspect}..."
-    store = options[AiSys::STORE_KEY] || AiSys::DEFAULT_STORE
-    attrs = store.find(lookup_hash, self.to_s)
-    attrs ? new(attrs) : attrs
   end
 
   def initialize(options={})
@@ -34,14 +66,20 @@ class Subcategory
     "#{@subcategory} is a subcategory of #{@category}"
   end
 
+  # Return: [obj, err]
   def create(options={})
-    puts "creating #{subclass_name} as subclass of #{superclass(options).inspect}"
-    subclass(options)
-    result = subclass(options) < superclass(options) # true/false
-    unless result
-      puts "! subclass(#{subclass(options).inspect}) < superclass(#{superclass(options).inspect})"
+    error = nil
+    puts "\nCREATING #{subclass_name} as subclass of #{superclass(options).inspect}"
+    created = subclass(options)
+    unless created < superclass(options)
+      error = "Failed to create subcategory"
+      puts "\t! subclass(#{created.inspect}) < superclass(#{superclass(options).inspect})"
     end
-    result
+    # need to find all relations that are stored specifically for this
+    # class (i.e. subclass)
+    # and define them on this subclass
+    puts
+    [created, error]
   end
 
   def save(store=@store)
@@ -80,7 +118,7 @@ class Subcategory
   # FIXME: duplicated code (see individual#clazz)
   def subclass(options={})
     unless @subclass
-      puts "got superclass: #{superclass(options)}"
+      puts "\tgot superclass: #{superclass(options)}"
       # FORCE subclassing... to fix hierarchy bug !?
       suppress_warnings {
         @context.const_set(subclass_name, Class.new(superclass(options)))
@@ -89,7 +127,7 @@ class Subcategory
       unless @subclass < superclass(options)
         warn "class-hierarchy ordering bug"
       end
-      puts "#{@subclass} is_a?(#{superclass(options)}): #{@subclass < superclass(options)}"
+      puts "\t#{@subclass} is_a?(#{superclass(options)}): #{@subclass < superclass(options)}\n"
     end
     @subclass
   end

@@ -5,6 +5,7 @@ class Individual
 
   def self.ind(individual, category)
     ind = new(INDIVIDUAL => individual, CATEGORY => category)
+    puts
     puts ind
     ind
   end
@@ -18,10 +19,17 @@ class Individual
     "#{@individual} is a #{@category}"
   end
 
+  # Return: [obj, err]
   def create(options={})
-    puts "creating #{@individual} as instance of #{@category.inspect}"
-    instance(options)
-    instance(options).is_a?(clazz(options))
+    error = nil
+    puts "\nCREATING #{@individual} as an instance of #{@category.inspect}\n"
+    created = instance_of(@category, options)
+    if created.is_a?(Subcategory.clazz_for(@category, options))
+      error = "Failed to create individual"
+    end
+    # lookup and extend any relations
+    # lookup any values and assign them
+    [created, error]
   end
 
   def save(store)
@@ -31,34 +39,11 @@ class Individual
     })
   end
 
-
-  private
-
-  def instance(options={})
+  def instance_of(category, options={})
     unless @instance
-      @instance = clazz(options).new # create an instance of @category...
+      @instance = Subcategory.clazz_for(category, options).new # create an instance of category...
     end
     @instance
-  end
-
-  # FIXME: duplicated code (see subcategory#subclass)
-  # lookup the class associated with @category
-  def clazz(options={})
-    unless @clazz
-      # these so-called "rules" are actually objects of type @category
-      if sub_category_rule = Subcategory.find_by({Subcategory::SUBCATEGORY_KEY => @category}, options)
-        @clazz = sub_category_rule.subclass(options)
-      elsif super_category_rule = Subcategory.find_by({Subcategory::CATEGORY_KEY => @category}, options)
-        @clazz = super_category_rule.superclass(options)
-      else
-        current_context = Object
-        unless current_context.const_defined?(@category)
-          current_context.const_set(@category, Class.new)
-        end
-        @clazz = current_context.const_get(@category)
-      end
-    end
-    @clazz
   end
 end
 require_relative "./subcategory"
