@@ -1,0 +1,62 @@
+// Brain Message Format
+"__head__": {
+  "__sequence__": {
+    "__id__": "<GUID>",
+    "__next__": "nil",
+    "__prev__": "self"
+  },
+  "__context__": {
+    "__vars__": {
+      cross-cutting-concerns: [
+        "hungry", "thirsty"
+      ],
+      "__emotions__": [
+        joyful, frustrated, sad, fearful, stressed, overwhelmed, angry, inspired(communal), convicted(spiritual)
+      ],
+      "__entities__": [
+        "God", "self", "other", "union", "product"
+      ],
+
+      // Need a DSL to define useful labels: [spouse (other with which self is in a union), parents (Union of others from which self is a product), kids(products), siblings(parents-other-kids)],
+      "__entity_aspects__": [
+        "physical-biological", "physical-nutritional", "psychological", "mental-emotional", "spiritual", "communal", "sexual", "mental-educational", "financial"
+      ]
+    },
+
+    // Who is this document for (subject/object): <entity: self or some other>
+    "to": "jonathan@his-service.net", // <-- the current self
+    "to-aspect": "need to contribute to something bigger than ourselves",
+    "about": "thomas_family@his-service.net", // <-- lookup and see that this self is to's (immediate) family
+
+    // Who or what is it about (topic): <aspect: financial-career> <-- a list of aspects, specific-tag-reference(s) (folksonomy), innumerable-tag-reference (too many to actually tag)
+    "aspect": "communal",
+    "subject": "sign-up family to volunteer at 2nd Harvest Food bank"
+
+    // Who or what is this from (Author): <entity: self or some other>
+    "from": "self",
+    "from-aspect": "need to contribute to something bigger than ourselves", // (why)
+    "TimeSent": 1449450789
+  }
+}
+
+#  Authority, Logic and Emotion seem to be the key impacts on Will-power & decision-making
+
+#  values seem to be some codification of ethos, pathos, and logos ...but they don't always line-up with the will!
+
+#  We often decide contrary to our values
+
+
+
+#  Calculus for how these aspects impact individual- and group-entities
+
+#  "States" like "fatThe igue" have a score across all of the aspects (I.e. It impacts ones emotions as well as ones biology) it may even impact ones family
+
+#  What do I focus on (right now): the fact that someone is giving me something, the thing they are giving, their tone, my options, my God's ability to handle this, etc
+
+#  What does it mean: beginning, end, punishment, etc
+
+#  Current state is one factor in decision making
+
+#  What's your target (discover this ...it's not a decision ...its not a short-term goal)
+
+#  What's you map (worldview, values) that tell you how to achieve your target: do means (not necc. the right thing) justify the ends (presumably the right thing)? Or do you believe in doing the right thing for right reasons, etc

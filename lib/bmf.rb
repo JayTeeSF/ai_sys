@@ -45,9 +45,9 @@ class AiSys
 
   def self.restore(options={})
     it = new(options)
-    puts "\nStarting with an Empty Repo: #{it.repo.inspect}"
+    puts "empty-repo: #{it.repo.inspect}"
     it.restore
-    puts "Continuing with Repo: #{it.repo.inspect}\n\n"
+    puts "restored-repo: #{it.repo.inspect}"
     it
   end
 
@@ -66,18 +66,17 @@ class AiSys
 
   def save
     result = @store.persist
-    puts "\nPersisted Repo: #{repo.inspect}\n"
+    puts "persisted-repo: #{repo.inspect}"
     result
   end
 
   #individual.rb
   def ind(individual, category)
     ind = ::Individual.ind(individual, category)
-    _ruby_ind, error = ind.create(AiSys::STORE_KEY => @store)
-    if error
-      warn "\t*** FAILED: to create #{individual} as an instance of #{category}: #{error}\n"
-    else
+    if ind.create(AiSys::STORE_KEY => @store)
       ind.save(@store)
+    else
+      warn "failed to create #{individual} as an instance of #{category}"
     end
     ind
   end
@@ -91,6 +90,8 @@ class AiSys
     #if rel.create
     if rel.create(AiSys::STORE_KEY => @store)
       rel.save(@store)
+    else
+      warn "failed to save the rel"
     end
     rel
   end
@@ -103,6 +104,8 @@ class AiSys
     # if val.create
     if val.create(AiSys::STORE_KEY => @store)
       val.save(@store)
+    else
+      warn "failed to save the value"
     end
     val
   end
@@ -110,11 +113,10 @@ class AiSys
   #subcategory.rb
   def sub(subcategory, category)
     sub = ::Subcategory.sub(subcategory, category)
-    _ruby_sub, error = sub.create
-    if error
-      warn "\t*** FAILED: to create class hierarcy: #{error}\n"
-    else
+    if sub.create
       sub.save(@store)
+    else
+      warn "failed to create class hierarcy"
     end
     sub
   end

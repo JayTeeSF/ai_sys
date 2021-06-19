@@ -17,11 +17,11 @@
 # }>
 
 
-require_relative "./ai_sys/individual"
-require_relative "./ai_sys/relation"
-require_relative "./ai_sys/value"
-require_relative "./ai_sys/subcategory"
-require_relative "./ai_sys/storage_wrapper"
+require "./ai_sys/individual.cr"
+require "./ai_sys/relation.cr"
+require "./ai_sys/value.cr"
+require "./ai_sys/subcategory.cr"
+require "./ai_sys/storage_wrapper.cr"
 
 class AiSys
   STORE_KEY = "store"
@@ -34,25 +34,25 @@ class AiSys
   # thx to ActiveSupport::Inflector
   def self.camelize(term)
     string = term.to_s.dup
-    #string = string.sub(/^[a-z\d]*/) { $&.capitalize }
     if string[0] =~ /[a-z\d]/
       string.capitalize!
     end
+    #string = string.sub(/^[a-z\d]*/) { $&.capitalize }
     string.gsub!(/(?:_|(\/))([a-z\d]*)/i) { "#{$1}#{$2.capitalize}" }
     string.gsub!("/", "::")
     string
   end
 
-  def self.restore(options={})
+  def self.restore(options={String => Array})
     it = new(options)
-    puts "\nStarting with an Empty Repo: #{it.repo.inspect}"
+    puts "empty-repo: #{it.repo.inspect}"
     it.restore
-    puts "Continuing with Repo: #{it.repo.inspect}\n\n"
+    puts "restored-repo: #{it.repo.inspect}"
     it
   end
 
   DEFAULT_STORE = StorageWrapper.new
-  def initialize(options={})
+  def initialize(options={String => Array})
     @store = options.delete(AiSys::STORE_KEY) || DEFAULT_STORE
   end
 
@@ -66,43 +66,39 @@ class AiSys
 
   def save
     result = @store.persist
-    puts "\nPersisted Repo: #{repo.inspect}\n"
+    puts "persisted-repo: #{repo.inspect}"
     result
   end
 
   #individual.rb
   def ind(individual, category)
     ind = ::Individual.ind(individual, category)
-    _ruby_ind, error = ind.create(AiSys::STORE_KEY => @store)
-    if error
-      warn "\t*** FAILED: to create #{individual} as an instance of #{category}: #{error}\n"
-    else
+    if ind.create(AiSys::STORE_KEY => @store)
       ind.save(@store)
+    else
+      warn "failed to create #{individual} as an instance of #{category}"
     end
     ind
   end
 
   #relation.rb
-  #def rel(range_category, domain_category, relation)
-  def rel(relation, domain_category, range_category)
-    # rel = ::Relation.rel(domain_category, range_category, relation)
-    rel = ::Relation.rel(relation, domain_category, range_category)
-      #domain_category, relation, range_category)
-    #if rel.create
-    if rel.create(AiSys::STORE_KEY => @store)
+  def rel(range_category, domain_category, relation)
+    rel = ::Relation.rel(domain_category, relation, range_category)
+    if rel.create
       rel.save(@store)
+    else
+      warn "failed to save the rel"
     end
     rel
   end
 
   #value.rb
-  # def val(individual, relation, value)
-  def val(relation, individual, value)
-    # val = ::Value.val(individual, relation, value)
-    val = ::Value.val(relation, individual, value)
-    # if val.create
-    if val.create(AiSys::STORE_KEY => @store)
+  def val(individual, relation, value)
+    val = ::Value.val(individual, relation, value)
+    if val.create
       val.save(@store)
+    else
+      warn "failed to save the value"
     end
     val
   end
@@ -110,11 +106,10 @@ class AiSys
   #subcategory.rb
   def sub(subcategory, category)
     sub = ::Subcategory.sub(subcategory, category)
-    _ruby_sub, error = sub.create
-    if error
-      warn "\t*** FAILED: to create class hierarcy: #{error}\n"
-    else
+    if sub.create
       sub.save(@store)
+    else
+      warn "failed to create class hierarcy"
     end
     sub
   end

@@ -1,4 +1,3 @@
-require_relative '../json_store'
 class StorageWrapper
   LATEST = -1
   DEFAULT_BASENAME = "storage"
@@ -11,7 +10,7 @@ class StorageWrapper
 
   # the finders will be key!
   def find(lookup_hash, _class_name)
-    puts "\tLOOKING-UP (& instantiating) object for: #{lookup_hash.inspect}\n"
+    puts "looking-up (& instantiating) object for: #{lookup_hash.inspect}"
     _all_class_attrs = (@repo[_class_name]||[])
 
     # Find a stored hash that matches the key-value-pairs in the
@@ -24,36 +23,17 @@ class StorageWrapper
 
     # NOT dup'ing the result, before calling .new(result) leads to a BUG
     # that modifies @repo !?
-    object =  result ? result.dup : result
-    object.__prepare__ if object.respond_to?(:__prepare__) # object could be individual (obj), relation(method that needs to be added to a class or individual), subcategory (sub-class of some other yet-to-be-looked-up class), etc...
-    return object
-  end
-
-  def find_all(lookup_hash, _class_name)
-    puts "\tLOOKING-UP (& instantiating) object(s) for: #{lookup_hash.inspect}\n"
-    _all_class_attrs = (@repo[_class_name]||[])
-
-    # Find all stored hashes that match the key-value-pairs in the
-    # incoming lookup_hash
-    results = _all_class_attrs.select do |stored_attr_hash|
-      lookup_hash.all? do |lookup_attr, lookup_value|
-        lookup_value == stored_attr_hash[lookup_attr]
-      end
-    end
-
-    # NOT dup'ing the result, before calling .new(result) leads to a BUG
-    # that modifies @repo !?
-    return results ? results.dup : results
+    return result ? result.dup : result
   end
 
   def restore(version=LATEST)
-    print "\tRESTORING"
+    print "restoring"
     current_db_files = dbs
     if LATEST == version
-      puts " the latest version...\n"
+      puts " the latest version..."
       db_file = current_db_files.first
     else
-      puts " version: #{version}...\n"
+      puts " version: #{version}..."
       db_file = current_db_files.detect do |f|
         file_to_extension_number(f) == version
       end
@@ -64,29 +44,29 @@ class StorageWrapper
       @repo = reload(db_file)
       true
     else
-      puts "\tNO-OP (no db(s))\n"
+      puts "no-op (no db(s))"
       false
     end
   end
 
   def persist
-    print "\tSTORING"
+    print "storing to"
     file_name = new_db
     if file_name
-      print " in new_db: "
+      print " new_db: "
     else
       if file_name = default_db
-        print " in default_db: "
+        print " default_db: "
       else
         return false
       end
     end
     _data_dump = data_dump
     if _data_dump == latest_data_load
-      puts " NO-OP (duplicate)...\n"
+      puts " no-op (duplicate)..."
       false
     else
-      puts " #{file_name}...\n"
+      puts " #{file_name}..."
       store(_data_dump, file_name)
       true
     end
@@ -95,13 +75,13 @@ class StorageWrapper
   def save(key, attributes={})
     key = key.to_s
     unless @repo[key]
-      puts "\tREPO adding array of: #{key}'s\n"
+      puts "REPO adding array of: #{key}'s"
       @repo[key] = []
     end
     if @repo[key].include?(attributes)
-      puts "\tREPO[#{key}]: no-op (duplicate)\n"
+      puts "REPO[#{key}]: no-op (duplicate)"
     else
-      puts "\tREPO[#{key}] << #{attributes.inspect}\n"
+      puts "REPO[#{key}] << #{attributes.inspect}"
       @repo[key].<<(attributes)
     end
   end
@@ -110,31 +90,20 @@ class StorageWrapper
   private
 
   def data_dump
-    #Marshal.dump(@repo)
-    @repo
+    Marshal.dump(@repo)
   end
 
-  # JSON.parse(File.read(db_file))
   def reload(db_file)
-    # Marshal.load(data_load(db_file))
-    data_load(db_file) do |db|
-      db.roots.reduce({}) { |memo, name|
-        memo[name] = db[name]
-        memo
-      }
-    end
+    Marshal.load(data_load(db_file))
   end
 
   def data_load(db_file)
-    #File.read(db_file)
-    jstore = ::JsonStore.new(db_file)
-    return jstore unless block_given?
-    jstore.transaction { yield jstore }
+    File.read(db_file)
   end
 
   def latest_data_load
     return unless latest_db
-    reload(latest_db)
+    data_load(latest_db)
   end
 
   def default_db_basename
@@ -161,12 +130,7 @@ class StorageWrapper
   end
 
   def store(data, file_name)
-    #File.open(file_name, 'w') { |f| f.write(data) }
-    data_load(file_name) do |db|
-      data.keys.each do |key|
-        db[key] = data[key]
-      end
-    end
+    File.open(file_name, 'w') { |f| f.write(data) }
   end
 
   # reverse sort files by extension

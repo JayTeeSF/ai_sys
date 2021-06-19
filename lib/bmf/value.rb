@@ -6,15 +6,6 @@ class Value
   INDIVIDUAL="individual"
   VALUE="value"
 
-  def self.find(relation, individual, options={})
-    return nil unless relation
-    return nil unless individual
-    puts "Finding '#{relation}' for ind: #{individual.inspect}..."
-    store = options[AiSys::STORE_KEY] || AiSys::DEFAULT_STORE
-    attrs = store.find({RELATION => relation, INDIVIDUAL => individual}, self.to_s)
-    attrs ? new(attrs) : attrs
-  end
-
   # def self.val(individual, relation, value)
   def self.val(relation, individual, value)
     val = new(
@@ -22,12 +13,10 @@ class Value
       RELATION => relation,
       VALUE => value
     )
-    puts
     puts val
     val
   end
 
-  attr_reader :value
   def initialize(options={})
     @individual = options.delete(INDIVIDUAL) # just the name!
     @relation = options.delete(RELATION)

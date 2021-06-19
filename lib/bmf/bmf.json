@@ -1,0 +1,57 @@
+"__head__": {
+  "__sequence__": {
+    "__id__": "<GUID>",
+    "__next__": "nil",
+    "__prev__": "self"
+  },
+  "__context__": {
+    "__vars__": {
+      "__cross-cutting-concerns__": [
+        "hungry", "thirsty"
+      ],
+      "__emotions__": [
+        "joyful", "frustrated", "sad", "fearful", "stressed", "overwhelmed", "angry", "inspired", "convicted"
+      ],
+      "__atomic_entities__": [
+        "God", "self", "other", "union", "product"
+      ],
+
+      "__derived_entities__": [
+        "spouse": "other with which self is in a union",
+        "parents": "union of others from which self is a product",
+        "kids": "products",
+        "siblings": "parents-other-kids"
+      ],
+      "__entity_aspects__": [
+        "physical-biological", "physical-nutritional", "psychological", "mental-emotional", "spiritual", "communal", "sexual", "mental-educational", "financial"
+      ]
+    },
+
+    "__subject_or_object__": "<entity: self or some other>",
+    "to": { "__identifier__": "jonathan@his-service.net", "__entity__": "self" },
+    "to-aspect": "need to contribute to something bigger than ourselves",
+    "about": { "__identifier__": "thomas_family@his-service.net", "__entity__": "family" },
+
+    "__topic_comment__": "a list of aspects, specific-tag-reference(s) (folksonomy), innumerable-tag-reference (too many to actually tag)",
+    "__topic__": "<aspect: financial-career>",
+    "aspect": "communal",
+    "subject": "sign-up family to volunteer at 2nd Harvest Food bank",
+
+    "__from_comment__": "Who or what is this from (Author): <entity: self or some other>",
+    "from": "self",
+    "why": "<aspect of the from> need to contribute to something bigger than ourselves",
+    "TimeSent": 1449450789
+  },
+  "what_is_self_targeting": "",
+  "what_is_the_current_state_of_self": "",
+  "what_is_self_focusing_on": "the fact that someone left the door open",
+  "what_does_it_mean_to_self": "a fresh beginning",
+  "what_to_do": "<decision>",
+  "directives_base_on_worldview": "<some_set_of_guidelines>"
+}
+#  values seem to be some codification of ethos, pathos, and logos ...but they don't always line-up with the will!
+
+#  Calculus for how these aspects impact individual- and group-entities
+
+#  "States" like "fatThe igue" have a score across all of the aspects (I.e. It impacts ones emotions as well as ones biology) it may even impact ones family
+

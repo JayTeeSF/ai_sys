@@ -13,10 +13,8 @@ see if we can re-write this to work with Crystal (vs. Ruby) to enable
 faster (i.e. more efficient & reasonable) processing
 
 ##
-consider switching to a JSON based pstore
-(vs. marshal) this should enable interoperability
-(i.e. use other programming languages to process various
-"brain"-snapshots
+Switched to a JSON based pstore (vs. marshal) to enable interoperability
+(i.e. use other programming languages to process various "brain"-snapshots)
 
 ###
 clauses made-up of:
